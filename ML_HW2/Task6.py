@@ -13,14 +13,12 @@ class NN:
     def accuracy(self, predictions, labels):
         return (100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1)) / predictions.shape[0])        
 
-    def constru_NN(self, images_val, labels_val, images_test, labels_test, deg_learn, layer, unit):
+    def constru_NN(self, images_val, labels_val, images_test, labels_test, deg_learn, layer, unit, momentum_rate):
         # Place the input image and corresponding label into the placeholders
         X = tf.placeholder(tf.float32, [None, 784], name='image')
         Y = tf.placeholder(tf.float32, [None, 10], name='label')
 
         dropout_rate = tf.placeholder("float")
-
-
         
         # Set up the 4 weight matrices: bias/input->hidden unit, bias/hidden unit->output
         b1 = tf.Variable(tf.zeros([unit[0]]), name='weight_b2h')
@@ -34,7 +32,6 @@ class NN:
             b2 = tf.zeros([unit[1]])
             w2 = tf.diag(tf.ones([unit[1]]))
 
-         
         if layer >= 3:
             b3 = tf.Variable(tf.zeros([unit[2]]), name='weight_2h22h3') 
             w3 = tf.Variable(tf.truncated_normal([unit[1], unit[2]], stddev=0.1), name='weight_h22h3')
@@ -45,64 +42,58 @@ class NN:
         b4 = tf.Variable(tf.zeros([10]), name='weight_h32o')
         w4 = tf.Variable(tf.truncated_normal([unit[2], 10], stddev=0.1), name='weight_h32o')
                
-
-
         # Set up the hyperparameters
-        learning_rate = pow(10, deg_learn)
-        training_epochs = 2000
-
-
+        learning_rate = pow(np.e, deg_learn)
+        training_epochs = 1000
+        momentum = momentum_rate
 
         # Set up 2 math operations: input -> hidden unit, hidden unit -> output
-        layer1_result = tf.nn.relu(tf.add(tf.matmul(X/255, w1), b1))
+        layer1_result = tf.nn.relu(tf.add(tf.matmul(X, w1), b1))
         dropout_rate_extra = dropout_rate
         
-        layer1_result_dropout = tf.nn.dropout(layer1_result, dropout_rate)
+        layer1_result_dropout = tf.nn.dropout(layer1_result, dropout_rate_extra)
         layer2_result = tf.nn.relu(tf.add(tf.matmul(layer1_result_dropout, w2), b2))
-        
-            
         if layer < 2:
-            dropout_rate_extra = 1.0
+            dropout_rate_extra = 1.0      
+            
         layer2_result_dropout = tf.nn.dropout(layer2_result, dropout_rate_extra)
         layer3_result = tf.nn.relu(tf.add(tf.matmul(layer2_result_dropout, w3), b3))
-
+         
         if layer < 3:
-            dropout_rate_extra = 1.0    
-        layer3_result_dropout = tf.nn.dropout(layer3_result, dropout_rate_extra)
+            dropout_rate_extra = 1.0   
+        layer3_result_dropout = tf.nn.dropout(layer3_result, dropout_rate)
             
         logits = tf.add(tf.matmul(layer3_result_dropout, w4), b4)
-
-
-
-
         # start to train the model, maximize the log-likelihood
         cost_batch = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=Y)
         cost = tf.reduce_mean(cost_batch)
 
-        optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+        optimizer = tf.train.MomentumOptimizer(learning_rate, momentum)
         train_step = optimizer.minimize(cost)
         
-
-
-        log_likelihood_train = -tf.reduce_sum(cost_batch)
-        layer1_result_valid = tf.nn.relu(tf.add(tf.matmul(images_val/255, w1), b1))
+        log_likelihood_train = -tf.reduce_mean(cost_batch)
+        layer1_result_valid = tf.nn.relu(tf.add(tf.matmul(images_val, w1), b1))
         layer2_result_valid = tf.nn.relu(tf.add(tf.matmul(layer1_result_valid, w2), b2))
         layer3_result_valid = tf.nn.relu(tf.add(tf.matmul(layer2_result_valid, w3), b3))
         logits_valid = tf.add(tf.matmul(layer3_result_valid, w4), b4)
-        log_likelihood_valid = -tf.reduce_sum(tf.nn.softmax_cross_entropy_with_logits(logits=logits_valid, labels=labels_val))
+        log_likelihood_valid = -tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits_valid, labels=labels_val))
         
         train_predition = tf.nn.softmax(logits)
         valid_prediction = tf.nn.softmax(logits_valid)
-        layer1_result_valid = tf.nn.relu(tf.add(tf.matmul(images_test/255, w1), b1))
-        layer2_result_valid = tf.nn.relu(tf.add(tf.matmul(layer1_result_valid, w2), b2))
-        layer3_result_valid = tf.nn.relu(tf.add(tf.matmul(layer2_result_valid, w3), b3))
-        logits_test = tf.add(tf.matmul(layer3_result_valid, w4), b4)
+        layer1_result_test = tf.nn.relu(tf.add(tf.matmul(images_test, w1), b1))
+        layer2_result_test = tf.nn.relu(tf.add(tf.matmul(layer1_result_test, w2), b2))
+        layer3_result_test = tf.nn.relu(tf.add(tf.matmul(layer2_result_test, w3), b3))
+        logits_test = tf.add(tf.matmul(layer3_result_test, w4), b4)
         test_prediction = tf.nn.softmax(logits_test)
         
         sess = tf.InteractiveSession()
         init = tf.initialize_all_variables()
         sess.run(init)
+
         result = np.zeros(shape=(5, training_epochs))
+        lilelihood_overfitting  = False
+        log_likelihood_max = -float("inf")
+        oscillation = 0
         
         for epoch in range(training_epochs):
             for i in xrange(300):
@@ -124,35 +115,68 @@ class NN:
             result[3, epoch] = likelihood_train
             result[4, epoch] = likelihood_val  
             
-            if(epoch % 1 == 0):
+            if(epoch % 10 == 0):
                 print ("Epoch:%04d, Train Accuracy=%0.4f, Eval Accuracy=%0.4f, log_likelyhood_train:%0.6f, log_likelyhood_val:%0.6f" % 
                     (epoch+1, accuracy_train, accuracy_val, likelihood_train, likelihood_val))
 
-        print sess.run(w3)
-        print sess.run(b3)
-        print sess.run(w2)
-        print sess.run(b2)
-        print sess.run(w1)
-        print sess.run(b1)
-        #Predict Test Error
+            if(log_likelihood_max < likelihood_val):
+                log_likelihood_max = likelihood_val
+                lilelihood_oscillation = 0
+            elif(log_likelihood_max - likelihood_val > 0):
+	        	lilelihood_oscillation += 1
+
+            if(lilelihood_overfitting == False):
+	        	if(lilelihood_oscillation >= 15):
+	        	    lilelihood_overfitting = True
+	        	    print "Likelihood overfitting"
+	        	    print ("Epoch:%04d, Train Accuracy=%0.4f, Eval Accuracy=%0.4f, log_likelyhood_train:%0.6f, log_likelyhood_val:%0.6f" % 
+		               (epoch+1, accuracy_train, accuracy_val, likelihood_train, likelihood_val))
+	        	    accuracy_test = self.accuracy(test_prediction.eval(), labels_test)
+	        	    print ("Test Accuracy=%0.4f" % (accuracy_test))
+	        	    print 'Test_Error: ' + repr((100 - accuracy_test) * 2720 / 100)
+	        	    print ("Validation Accuracy=%0.4f" % (accuracy_val))
+	        	    print 'Validation_Error: ' + repr((100 - accuracy_val) * 1000 / 100)
+
+	        	    plt.plot(result[0,:epoch], result[1,:epoch],'b-', label='Validation Error')
+	        	    plt.plot(result[0,:epoch], result[2,:epoch],'r-', label = 'Training Error')
+	        	    plt.legend(loc = 'upper right', numpoints = 1)
+	        	    plt.xlabel('Number of Epochs')
+	        	    plt.ylabel('Number of Errors')
+	        	    plt.savefig('err_early')
+	        	    plt.close()
+	        	    
+	        	    plt.plot(result[0,:epoch], result[3,:epoch],'b-', label = 'Log-likelihood_Training')
+	        	    plt.plot(result[0,:epoch], result[4,:epoch],'r-', label = 'Log-likelihood_Validation')
+	        	    plt.legend(loc = 'lower right', numpoints = 1)
+	        	    plt.xlabel('Number of Epochs')
+	        	    plt.ylabel('Log-likelihood')
+	        	    plt.savefig('log_early')
+	        	    plt.close()
+
+        print "Complete:"
         accuracy_test = self.accuracy(test_prediction.eval(), labels_test)
         print ("Test Accuracy=%0.4f" % (accuracy_test))
         print 'Test_Error: ' + repr((100 - accuracy_test) * 2720 / 100)
+        print ("Validation Accuracy=%0.4f" % (accuracy_val))
+        print 'Validation_Error: ' + repr((100 - accuracy_val) * 1000 / 100)
 
-        plt.plot(result[0,:], result[1,:],'b-', label='Validation Error')
-        plt.plot(result[0,:], result[2,:],'r-', label = 'Training Error')
-        plt.legend(loc = 'upper right', numpoints = 1)
-        plt.xlabel('Number of Epochs')
-        plt.ylabel('Number of Errors')
-        plt.show()
-
-        plt.plot(result[0,:], result[3,:],'b-', label = 'Log-likelihood_Training')
-        plt.plot(result[0,:], result[4,:],'r-', label = 'Log-likelihood_Validation')
-        plt.legend(loc = 'lower right', numpoints = 1)
-        plt.xlabel('Number of Epochs')
-        plt.ylabel('Log-likelihood')
-        plt.show()
+    	plt.plot(result[0,:], result[1,:],'b-', label='Validation Error')
+    	plt.plot(result[0,:], result[2,:],'r-', label = 'Training Error')
+    	plt.legend(loc = 'upper right', numpoints = 1)
+    	plt.xlabel('Number of Epochs')
+    	plt.ylabel('Number of Errors')
+    	plt.savefig('err')
+    	plt.close()
+    	plt.plot(result[0,:], result[3,:],'b-', label = 'Log-likelihood_Training')
+    	plt.plot(result[0,:], result[4,:],'r-', label = 'Log-likelihood_Validation')
+    	plt.legend(loc = 'lower right', numpoints = 1)
+    	plt.xlabel('Number of Epochs')
+    	plt.ylabel('Log-likelihood')
+    	plt.savefig('log') 
+    	plt.close()
   
+
+
 with np.load("notMNIST.npz") as data:
     images , labels = data["images"], data["labels"]
 
@@ -165,9 +189,10 @@ for i in labels:
 
 # Random seed on time, generate the hyperparameters
 random.seed(datetime.now())
-drop_out = random.randint(5,10)*0.1     # drop-out rate is either 0.5 - 0.9(drop) or 1.0 (non-drop)
+drop_out = random.randint(1,2) * 0.5    # drop-out rate is either 0.5 - 0.9(drop) or 1.0 (non-drop)
 deg_learn = random.uniform(-4,-2)       # exponent of the learning rate based on 10
 layer = random.randint(1,3)             # uniformly select the number of the NN layer from 1 to 3
+momentum_rate = random.randint(3,5) * 0.1
 
 unit_amount=[0,0,0]                     # Generate the number of units at each layer according to the total layers
 for i in range(3):
@@ -175,7 +200,17 @@ for i in range(3):
         unit_amount[i] = random.randint(100, 500);
     else:
         unit_amount[i] = unit_amount[i-1]
-print drop_out, deg_learn, layer, unit_amount
 
-cnn = NN(images_in[:15000,:], labels_in[:15000,:], drop_out)
-cnn.constru_NN(images_in[15000:16000,:], labels_in[15000:16000,:], images_in[16000:18720,:], labels_in[16000:18720,:], deg_learn, layer, unit_amount)
+print "log of learning rate: %f" % (deg_learn)
+print "number of layers: %d" % (layer)
+if layer < 2:
+    print "number of hidden units per layer: %d" % (unit_amount[0])
+elif layer < 3:
+    print "number of hidden units per layer: %d %d" % (unit_amount[0], unit_amount[1])
+else:
+    print "number of hidden units per layer: %d %d %d" % (unit_amount[0], unit_amount[1], unit_amount[2])   
+print "dropout rate:" + repr(drop_out)
+print "momentum rate:" + repr(momentum_rate)
+
+nn = NN(images_in[:15000,:]/255, labels_in[:15000,:], drop_out)
+nn.constru_NN(images_in[15000:16000,:]/255, labels_in[15000:16000,:], images_in[16000:18720,:]/255, labels_in[16000:18720,:], deg_learn, layer, unit_amount, momentum_rate)
