@@ -1,0 +1,55 @@
+I tensorflow/core/common_runtime/local_device.cc:40] Local device intra op parallelism threads: 8
+I tensorflow/core/common_runtime/direct_session.cc:58] Direct session inter op parallelism threads: 8
+Epoch:0001, Train Accuracy=85.2200, Eval Accuracy=83.8000, log_likelyhood_train:-0.530188, log_likelyhood_val:-0.547546
+Epoch:0021, Train Accuracy=94.6000, Eval Accuracy=90.5000, log_likelyhood_train:-0.204921, log_likelyhood_val:-0.343882
+Epoch:0041, Train Accuracy=97.2933, Eval Accuracy=91.6000, log_likelyhood_train:-0.125240, log_likelyhood_val:-0.327657
+Epoch:0061, Train Accuracy=98.6533, Eval Accuracy=91.6000, log_likelyhood_train:-0.079747, log_likelyhood_val:-0.325672
+Epoch:0081, Train Accuracy=99.4067, Eval Accuracy=91.8000, log_likelyhood_train:-0.052593, log_likelyhood_val:-0.330656
+Epoch:0101, Train Accuracy=99.7400, Eval Accuracy=91.7000, log_likelyhood_train:-0.036394, log_likelyhood_val:-0.339190
+Epoch:0121, Train Accuracy=99.9000, Eval Accuracy=91.8000, log_likelyhood_train:-0.026690, log_likelyhood_val:-0.349446
+Epoch:0141, Train Accuracy=99.9267, Eval Accuracy=91.9000, log_likelyhood_train:-0.020613, log_likelyhood_val:-0.359439
+Epoch:0161, Train Accuracy=99.9400, Eval Accuracy=91.9000, log_likelyhood_train:-0.016590, log_likelyhood_val:-0.369089
+Epoch:0181, Train Accuracy=99.9533, Eval Accuracy=91.9000, log_likelyhood_train:-0.013763, log_likelyhood_val:-0.377569
+Epoch:0201, Train Accuracy=99.9533, Eval Accuracy=92.1000, log_likelyhood_train:-0.011703, log_likelyhood_val:-0.385292
+Epoch:0221, Train Accuracy=99.9533, Eval Accuracy=92.1000, log_likelyhood_train:-0.010142, log_likelyhood_val:-0.392279
+Epoch:0241, Train Accuracy=99.9533, Eval Accuracy=92.1000, log_likelyhood_train:-0.008922, log_likelyhood_val:-0.398841
+Epoch:0261, Train Accuracy=99.9600, Eval Accuracy=92.0000, log_likelyhood_train:-0.007951, log_likelyhood_val:-0.405042
+Epoch:0281, Train Accuracy=99.9600, Eval Accuracy=92.1000, log_likelyhood_train:-0.007156, log_likelyhood_val:-0.410773
+Epoch:0301, Train Accuracy=99.9667, Eval Accuracy=92.0000, log_likelyhood_train:-0.006500, log_likelyhood_val:-0.416192
+Epoch:0321, Train Accuracy=99.9667, Eval Accuracy=92.0000, log_likelyhood_train:-0.005946, log_likelyhood_val:-0.421222
+Epoch:0341, Train Accuracy=99.9667, Eval Accuracy=92.0000, log_likelyhood_train:-0.005476, log_likelyhood_val:-0.425936
+Epoch:0361, Train Accuracy=99.9667, Eval Accuracy=92.0000, log_likelyhood_train:-0.005074, log_likelyhood_val:-0.430295
+Epoch:0381, Train Accuracy=99.9667, Eval Accuracy=92.0000, log_likelyhood_train:-0.004725, log_likelyhood_val:-0.434529
+Epoch:0401, Train Accuracy=99.9667, Eval Accuracy=92.0000, log_likelyhood_train:-0.004421, log_likelyhood_val:-0.438473
+Epoch:0421, Train Accuracy=99.9667, Eval Accuracy=92.0000, log_likelyhood_train:-0.004156, log_likelyhood_val:-0.442188
+Epoch:0441, Train Accuracy=99.9667, Eval Accuracy=92.0000, log_likelyhood_train:-0.003919, log_likelyhood_val:-0.445819
+Epoch:0461, Train Accuracy=99.9667, Eval Accuracy=92.0000, log_likelyhood_train:-0.003709, log_likelyhood_val:-0.449222
+Epoch:0481, Train Accuracy=99.9667, Eval Accuracy=92.0000, log_likelyhood_train:-0.003522, log_likelyhood_val:-0.452543
+Epoch:0501, Train Accuracy=99.9667, Eval Accuracy=91.9000, log_likelyhood_train:-0.003354, log_likelyhood_val:-0.455707
+Epoch:0521, Train Accuracy=99.9667, Eval Accuracy=91.9000, log_likelyhood_train:-0.003202, log_likelyhood_val:-0.458765
+Epoch:0541, Train Accuracy=99.9667, Eval Accuracy=91.9000, log_likelyhood_train:-0.003064, log_likelyhood_val:-0.461660
+Epoch:0561, Train Accuracy=99.9667, Eval Accuracy=91.9000, log_likelyhood_train:-0.002938, log_likelyhood_val:-0.464508
+Epoch:0581, Train Accuracy=99.9667, Eval Accuracy=91.9000, log_likelyhood_train:-0.002823, log_likelyhood_val:-0.467228
+Epoch:0601, Train Accuracy=99.9667, Eval Accuracy=91.9000, log_likelyhood_train:-0.002719, log_likelyhood_val:-0.469838
+Epoch:0621, Train Accuracy=99.9667, Eval Accuracy=91.9000, log_likelyhood_train:-0.002622, log_likelyhood_val:-0.472366
+Epoch:0641, Train Accuracy=99.9667, Eval Accuracy=91.9000, log_likelyhood_train:-0.002534, log_likelyhood_val:-0.474823
+Epoch:0661, Train Accuracy=99.9667, Eval Accuracy=91.9000, log_likelyhood_train:-0.002452, log_likelyhood_val:-0.477197
+Epoch:0681, Train Accuracy=99.9667, Eval Accuracy=91.9000, log_likelyhood_train:-0.002376, log_likelyhood_val:-0.479489
+Epoch:0701, Train Accuracy=99.9667, Eval Accuracy=91.9000, log_likelyhood_train:-0.002306, log_likelyhood_val:-0.481716
+Epoch:0721, Train Accuracy=99.9667, Eval Accuracy=91.9000, log_likelyhood_train:-0.002240, log_likelyhood_val:-0.483911
+Epoch:0741, Train Accuracy=99.9667, Eval Accuracy=91.9000, log_likelyhood_train:-0.002180, log_likelyhood_val:-0.485971
+Epoch:0761, Train Accuracy=99.9667, Eval Accuracy=91.9000, log_likelyhood_train:-0.002123, log_likelyhood_val:-0.487999
+Epoch:0781, Train Accuracy=99.9667, Eval Accuracy=91.9000, log_likelyhood_train:-0.002069, log_likelyhood_val:-0.489920
+Epoch:0801, Train Accuracy=99.9667, Eval Accuracy=91.9000, log_likelyhood_train:-0.002019, log_likelyhood_val:-0.491823
+Epoch:0821, Train Accuracy=99.9667, Eval Accuracy=91.8000, log_likelyhood_train:-0.001972, log_likelyhood_val:-0.493679
+Epoch:0841, Train Accuracy=99.9667, Eval Accuracy=91.8000, log_likelyhood_train:-0.001929, log_likelyhood_val:-0.495499
+Epoch:0861, Train Accuracy=99.9667, Eval Accuracy=91.8000, log_likelyhood_train:-0.001887, log_likelyhood_val:-0.497205
+Epoch:0881, Train Accuracy=99.9667, Eval Accuracy=91.8000, log_likelyhood_train:-0.001848, log_likelyhood_val:-0.498914
+Epoch:0901, Train Accuracy=99.9667, Eval Accuracy=91.8000, log_likelyhood_train:-0.001811, log_likelyhood_val:-0.500547
+Epoch:0921, Train Accuracy=99.9667, Eval Accuracy=91.8000, log_likelyhood_train:-0.001776, log_likelyhood_val:-0.502182
+Epoch:0941, Train Accuracy=99.9667, Eval Accuracy=91.8000, log_likelyhood_train:-0.001743, log_likelyhood_val:-0.503739
+Epoch:0961, Train Accuracy=99.9667, Eval Accuracy=91.8000, log_likelyhood_train:-0.001712, log_likelyhood_val:-0.505292
+Epoch:0981, Train Accuracy=99.9667, Eval Accuracy=91.8000, log_likelyhood_train:-0.001682, log_likelyhood_val:-0.506798
+Test Accuracy=90.9559
+Test_Error: 246.00000000000009
+
