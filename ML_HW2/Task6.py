@@ -20,11 +20,11 @@ class NN:
 
         dropout_rate = tf.placeholder("float")
         
-        # Set up the 4 weight matrices: bias/input->hidden unit, bias/hidden unit->output
+        # Set up the weight matrices: bias/input->hidden unit, hidden unit->hidden unit, bias/hidden unit->output
         b1 = tf.Variable(tf.zeros([unit[0]]), name='weight_b2h')
         w1 = tf.Variable(tf.truncated_normal([784, unit[0]], stddev=0.1), name='weight_i2h1')
         
-        
+        # If the number of layer > 2, set the weight and bias as variable, otherwise set them as 0 and identity matrix   
         if layer >= 2:
             b2 = tf.Variable(tf.zeros([unit[1]]), name='weight_h12h2')
             w2 = tf.Variable(tf.truncated_normal([unit[0], unit[1]], stddev=0.1), name='weight_h12h2')
@@ -32,6 +32,7 @@ class NN:
             b2 = tf.zeros([unit[1]])
             w2 = tf.diag(tf.ones([unit[1]]))
 
+        # If the number of layer > 3, set the weight and bias as variable, otherwise set them as 0 and identity matrix   
         if layer >= 3:
             b3 = tf.Variable(tf.zeros([unit[2]]), name='weight_2h22h3') 
             w3 = tf.Variable(tf.truncated_normal([unit[1], unit[2]], stddev=0.1), name='weight_h22h3')
@@ -43,11 +44,11 @@ class NN:
         w4 = tf.Variable(tf.truncated_normal([unit[2], 10], stddev=0.1), name='weight_h32o')
                
         # Set up the hyperparameters
-        learning_rate = pow(np.e, deg_learn)
-        training_epochs = 1000
+        learning_rate = pow(10, deg_learn)
+        training_epochs = 1500
         momentum = momentum_rate
 
-        # Set up 2 math operations: input -> hidden unit, hidden unit -> output
+        # Set up math operations: input -> hidden unit, hidden unit -> hidden unit and hidden unit -> output
         layer1_result = tf.nn.relu(tf.add(tf.matmul(X, w1), b1))
         dropout_rate_extra = dropout_rate
         
@@ -71,6 +72,7 @@ class NN:
         optimizer = tf.train.MomentumOptimizer(learning_rate, momentum)
         train_step = optimizer.minimize(cost)
         
+        # Compute the log-likelihood of training data and validation data
         log_likelihood_train = -tf.reduce_mean(cost_batch)
         layer1_result_valid = tf.nn.relu(tf.add(tf.matmul(images_val, w1), b1))
         layer2_result_valid = tf.nn.relu(tf.add(tf.matmul(layer1_result_valid, w2), b2))
@@ -78,6 +80,7 @@ class NN:
         logits_valid = tf.add(tf.matmul(layer3_result_valid, w4), b4)
         log_likelihood_valid = -tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits_valid, labels=labels_val))
         
+        # Compute the prediciton by using the softmax
         train_predition = tf.nn.softmax(logits)
         valid_prediction = tf.nn.softmax(logits_valid)
         layer1_result_test = tf.nn.relu(tf.add(tf.matmul(images_test, w1), b1))
@@ -102,7 +105,6 @@ class NN:
                 cost_np, _ = sess.run([cost,train_step], 
                     feed_dict={X: batch_xs, Y: batch_ys, dropout_rate: self.drop_out})
         
-           
             likelihood_train, predictions_train = sess.run([log_likelihood_train, train_predition], 
                 feed_dict={X: self.images, Y:self.labels, dropout_rate: 1.0})
             accuracy_train = self.accuracy(predictions_train, self.labels)
@@ -115,10 +117,11 @@ class NN:
             result[3, epoch] = likelihood_train
             result[4, epoch] = likelihood_val  
             
-            if(epoch % 10 == 0):
+            if(epoch % 50 == 0):
                 print ("Epoch:%04d, Train Accuracy=%0.4f, Eval Accuracy=%0.4f, log_likelyhood_train:%0.6f, log_likelyhood_val:%0.6f" % 
                     (epoch+1, accuracy_train, accuracy_val, likelihood_train, likelihood_val))
 
+            # When the log-likelihood reaches at maximum, use the early stopping to stop the training
             if(log_likelihood_max < likelihood_val):
                 log_likelihood_max = likelihood_val
                 lilelihood_oscillation = 0
@@ -144,7 +147,7 @@ class NN:
 	        	    plt.ylabel('Number of Errors')
 	        	    plt.savefig('err_early')
 	        	    plt.close()
-	        	    
+                    	        	    
 	        	    plt.plot(result[0,:epoch], result[3,:epoch],'b-', label = 'Log-likelihood_Training')
 	        	    plt.plot(result[0,:epoch], result[4,:epoch],'r-', label = 'Log-likelihood_Validation')
 	        	    plt.legend(loc = 'lower right', numpoints = 1)
@@ -152,8 +155,9 @@ class NN:
 	        	    plt.ylabel('Log-likelihood')
 	        	    plt.savefig('log_early')
 	        	    plt.close()
-
-        print "Complete:"
+	            
+        # Compute the test errors after the complete training process
+        print "Complete Training:"
         accuracy_test = self.accuracy(test_prediction.eval(), labels_test)
         print ("Test Accuracy=%0.4f" % (accuracy_test))
         print 'Test_Error: ' + repr((100 - accuracy_test) * 2720 / 100)
@@ -165,21 +169,23 @@ class NN:
     	plt.legend(loc = 'upper right', numpoints = 1)
     	plt.xlabel('Number of Epochs')
     	plt.ylabel('Number of Errors')
-    	plt.savefig('err')
-    	plt.close()
+        plt.savefig('err')
+        plt.close()
+
     	plt.plot(result[0,:], result[3,:],'b-', label = 'Log-likelihood_Training')
     	plt.plot(result[0,:], result[4,:],'r-', label = 'Log-likelihood_Validation')
     	plt.legend(loc = 'lower right', numpoints = 1)
     	plt.xlabel('Number of Epochs')
     	plt.ylabel('Log-likelihood')
-    	plt.savefig('log') 
-    	plt.close()
+        plt.savefig('log')
+        plt.close()
   
 
 
 with np.load("notMNIST.npz") as data:
     images , labels = data["images"], data["labels"]
 
+# Reshape the imput data 
 images_in = images.reshape(784,18720).T.astype("float32")
 labels_in = np.zeros([18720,10]).astype("float32")
 index = 0
@@ -189,18 +195,19 @@ for i in labels:
 
 # Random seed on time, generate the hyperparameters
 random.seed(datetime.now())
-drop_out = random.randint(1,2) * 0.5    # drop-out rate is either 0.5 - 0.9(drop) or 1.0 (non-drop)
-deg_learn = random.uniform(-4,-2)       # exponent of the learning rate based on 10
-layer = random.randint(1,3)             # uniformly select the number of the NN layer from 1 to 3
-momentum_rate = random.randint(3,5) * 0.1
+drop_out = random.randint(1,2) * 0.5        # drop-out rate is either 0.5 (drop) or 1.0 (non-drop)
+deg_learn = random.uniform(-4,-2)           # exponent of the learning rate based on 10
+layer = random.randint(1,3)                 # uniformly select the number of the NN layer from 1 to 3
+momentum_rate = random.randint(3,5) * 0.1   # uniformly select the momentum rate from 0.3 to 0.5
 
-unit_amount=[0,0,0]                     # Generate the number of units at each layer according to the total layers
+unit_amount=[0,0,0]                         # Generate the number of units at each layer according to the total layers
 for i in range(3):
     if i < layer:
         unit_amount[i] = random.randint(100, 500);
     else:
         unit_amount[i] = unit_amount[i-1]
 
+# Print the hyperparameter settings:
 print "log of learning rate: %f" % (deg_learn)
 print "number of layers: %d" % (layer)
 if layer < 2:

@@ -36,11 +36,13 @@ class NN:
         optimizer = tf.train.MomentumOptimizer(learning_rate, momentum)
         train_step = optimizer.minimize(cost)
         
+        # Compute the log-likelihood of training data and validation data
         log_likelihood_train = -tf.reduce_mean(cost_batch)
         layer1_result_valid = tf.nn.relu(tf.add(tf.matmul(images_val, w1), b1))
         logits_valid = tf.add(tf.matmul(layer1_result_valid, w2), b2)
         log_likelihood_valid = -tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits_valid, labels=labels_val))
 
+        # Calculate the predition with softmax
         train_predition = tf.nn.softmax(logits)
         valid_prediction = tf.nn.softmax(logits_valid)
         layer1_result_valid = tf.nn.relu(tf.add(tf.matmul(images_test, w1), b1))
@@ -81,10 +83,11 @@ class NN:
             result[3, epoch] = likelihood_train
             result[4, epoch] = likelihood_val  
 
-            if(epoch % 10 == 0):
+            if(epoch % 50 == 0):
                 print ("Epoch:%04d, Train Accuracy=%0.4f, Eval Accuracy=%0.4f, log_likelyhood_train:%0.6f, log_likelyhood_val:%0.6f" % 
                     (epoch+1, accuracy_train, accuracy_val, likelihood_train, likelihood_val))
 
+            # When the log-likelihood reaches at maximum, use the early stopping to stop the training
             if(log_likelihood_max < likelihood_val):
                 log_likelihood_max = likelihood_val
                 lilelihood_oscillation = 0
@@ -116,10 +119,9 @@ class NN:
 	        	    plt.xlabel('Number of Epochs')
 	        	    plt.ylabel('Log-likelihood')
 	        	    plt.savefig(filename2)
-	        	    plt.close()
+	        	    plt.close()   
 
-	            
-
+        # Compute the test errors after the complete training process
         print "Complete:"
         accuracy_test = self.accuracy(test_prediction.eval(), labels_test)
         print ("Test Accuracy=%0.4f" % (accuracy_test))
@@ -142,15 +144,16 @@ class NN:
         plt.close()
         
     def constru_NN(self, images_val, labels_val, images_test, labels_test):
+        # Try different number of hidden units
         num_hidden_units = [100, 500, 1000]
         for i in num_hidden_units:
             self.train_data(images_val, labels_val, images_test, labels_test, i)
-
 
         
 with np.load("notMNIST.npz") as data:
     images , labels = data["images"], data["labels"]
 
+# Reshape the imput data 
 images_in = images.reshape(784,18720).T.astype("float32")
 labels_in = np.zeros([18720,10]).astype("float32")
 index = 0

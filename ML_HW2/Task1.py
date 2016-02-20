@@ -18,7 +18,7 @@ class SOFTMAX:
         b = tf.Variable(tf.zeros([10]), name="bias")
 
         # Set up the hyperparameters
-        learning_rate = 0.001	
+        learning_rate = 0.01	
         momentum = 0.4
         training_epochs = 1000
         
@@ -34,6 +34,7 @@ class SOFTMAX:
         log_likelihood_valid = -tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
             logits=tf.add(tf.matmul(images_val, W), b), labels=labels_val))
 
+        # Calculate the predition with softmax
         train_predition = tf.nn.softmax(logits)
         valid_prediction = tf.nn.softmax(tf.add(tf.matmul(images_val, W), b))
         test_prediction = tf.nn.softmax(tf.add(tf.matmul(images_test, W), b))
@@ -68,10 +69,11 @@ class SOFTMAX:
 	        result[3, epoch] = likelihood_train
 	        result[4, epoch] = likelihood_val
 	   
-	        if(epoch % 10 == 0):
+	        if(epoch % 50 == 0):
 	        	print ("Epoch:%04d, Train Accuracy=%0.4f, Eval Accuracy=%0.4f, log_likelyhood_train:%0.6f, log_likelyhood_val:%0.6f" %
 	        		(epoch+1, accuracy_train, accuracy_val, likelihood_train, likelihood_val))
 
+            # When the log-likelihood reaches at maximum, use the early stopping to stop the training
 	        if(log_likelihood_max < likelihood_val):
 	        	log_likelihood_max = likelihood_val
 	        	lilelihood_oscillation = 0
@@ -104,6 +106,7 @@ class SOFTMAX:
 	        	    plt.savefig('log_early')
 	        	    plt.close()
         
+        # Compute the test errors after the complete training process 
         print "Complete:"
         accuracy_test = self.accuracy(test_prediction.eval(), labels_test)
         print ("Test Accuracy=%0.4f" % (accuracy_test))
@@ -129,6 +132,7 @@ class SOFTMAX:
 with np.load("notMNIST.npz") as data:
     images , labels = data["images"], data["labels"]
 
+# Reshape the imput data 
 images_in = images.reshape(784,18720).T.astype("float32")
 labels_in = np.zeros([18720,10]).astype("float32")
 index = 0
@@ -136,5 +140,6 @@ for i in labels:
     labels_in[index, i] = 1
     index +=1
 
+# The input data is divided by 255 so as to normalize the data in the range of 0 - 1 and reduce the error
 softmax = SOFTMAX(images_in[:15000,:]/255, labels_in[:15000,:])
 softmax.constru_SOFTMAX(images_in[15000:16000,:]/255, labels_in[15000:16000,:], images_in[16000:18720,:]/255, labels_in[16000:18720,:])
