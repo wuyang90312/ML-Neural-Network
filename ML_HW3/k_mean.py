@@ -10,7 +10,6 @@ import tensorflow as tf
 import math as mt
 import Euclid_Distance as ed # import functions from local
 from matplotlib.pyplot import *
-import itertools
  
 class k_mean:
 
@@ -66,7 +65,7 @@ class k_mean:
         min_idx = []
         record, loss_prv = 0, 0
         for epoch in range(training_epochs):
-            loss_np, min_idx, _ = sess.run([loss, cluster, train_op], feed_dict={X: X_tmp})
+            loss_np, min_idx, mu, _ = sess.run([loss, cluster, Y, train_op], feed_dict={X: X_tmp})
             if record == 20:
             	break
             elif loss_prv == loss_np:
@@ -78,8 +77,7 @@ class k_mean:
             	print loss_np
             	print Y.eval()
 
-        min_idx = np.array(min_idx)
-        return res_loss, min_idx, X_tmp
+        return res_loss, min_idx, X_tmp, mu
         
 K = 3 # Define 3 clusters
 D = 2 #len(mean) # numbers of element per each dataset
@@ -87,19 +85,23 @@ B = 10000
                 
 km = k_mean("data2D.npy")
 # Required argument: numbers of clusters, dimensions of points, numbers of points
-res_loss, min_idx, X_tmp = km.cluster(K, D, B)
+res_loss, min_idx, X_tmp, mu= km.cluster(K, D, B)
 
 # Plot of the loss function
 fig1 = figure(1)
 plot(res_loss, 'b')
 show()
 
+
+print mu
 # Plot of clusters
 fig2 = figure(2)
-colors = itertools.cycle(["r","b","g"])
+colors = ["r","b","g"]
 for i in range(3):
-    myc = next(colors)
+    col = colors[i]
     data = X_tmp[np.where(min_idx == i), :]
     data = data[0, :]
-    scatter(data[:, 0], data[:, 1], c = myc, alpha = 0.2)
+    scatter(data[:, 0], data[:, 1], c = col, alpha = 0.2)
+for i in range(3):
+    scatter(mu[i, 0], mu[i, 1], c = 'white', alpha = 1, marker = '+', s = 100)
 show()
