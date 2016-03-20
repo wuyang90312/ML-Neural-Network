@@ -9,21 +9,18 @@ import tensorflow as tf
 
 
 class Euclid_Distance:
-    def __init__(self, X, Y, K, B):
+    def __init__(self, X, Y, D):
         self.X = X
         self.Y = Y
-        self.K = K
-        self.B = B
+        self.D = D
         
     def cal_Euclid_dis(self):
-        x2 = self.cal_square(self.X, self.B,self.K)
-        y2 = self.cal_square(self.Y, self.K, self.B)
+        x2 = self.cal_square(self.X)
+        y2 = self.cal_square(self.Y)
         xy = self.cal_XY(self.X,self.Y)
         
         Euclid_dist = x2 + tf.transpose(y2) - 2*xy
         #print Euclid_dist.eval()
-        print x2.eval()
-        print y2.eval()
         return Euclid_dist
         '''
         The format of the return value(solution):
@@ -34,12 +31,9 @@ class Euclid_Distance:
         '''
         
 
-    def cal_square(self, X, size_X, size_Y):
-        square = tf.matmul(X, X, False, True)
-        sqr_2_diag = tf.pack([square[i,i] for i in range(size_X)])
-        diagonal = tf.diag(sqr_2_diag)
-        ones = tf.ones(shape = [size_X, size_Y])
-        result = tf.matmul(diagonal, ones, True)
+    def cal_square(self, X):
+        square = tf.square(X)
+        result = tf.matmul(square, tf.ones(shape=[self.D ,1]))
         return result
 
     def cal_XY(self, X, Y):
@@ -50,10 +44,10 @@ class Euclid_Distance:
 
 X= np.array([[1,2], [2,3], [3,4]], dtype = np.float32)
 Y= np.array([[0,1], [1,2]], dtype = np.float32)
-'''
-with tf.Session():
-    ED = Euclid_Distance(X, Y, 2, 3)
-    print ED.cal_Euclid_dis().eval()
-'''
+
+# with tf.Session():
+#     ED = Euclid_Distance(X, Y, 2, 3)
+#     print ED.cal_Euclid_dis().eval()
+
 
 

@@ -36,12 +36,12 @@ class k_mean:
 
         #with sess.as_default():
         #print Y.eval()
-        ED = ed.Euclid_Distance(X, Y, K, B)
+        ED = ed.Euclid_Distance(X, Y, D)
         dist = ED.cal_Euclid_dis()
         cluster = tf.argmin(dist, 1)
         correspond_cluster = tf.gather(Y,cluster)
         offset = tf.sub(X, correspond_cluster)
-        loss = tf.reduce_sum(tf.square(offset))
+        loss = tf.reduce_mean(tf.square(offset))
         '''
         print cluster.eval()
         print offset.eval()
@@ -49,7 +49,7 @@ class k_mean:
         '''
 
         # Set up the hyperparameters
-        learning_rate =  0.001	
+        learning_rate =  0.01	
         epsilon = 1e-5
         beta1 = 0.9
         beta2 = 0.99
