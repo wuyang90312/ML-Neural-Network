@@ -7,9 +7,9 @@ its cluster center rather than to the other centers
 
 import numpy as np
 import tensorflow as tf
-import math as mt
 import Euclid_Distance as ed # import functions from local
-from matplotlib.pyplot import *
+import plot_generator as plot
+# from matplotlib.pyplot import *
  
 class k_mean:
 
@@ -73,35 +73,21 @@ class k_mean:
             else:
             	loss_prv = loss_np
             res_loss.append(loss_np)
+            '''
             if(epoch % 20 == 0):
             	print loss_np
             	print Y.eval()
-
-        return res_loss, min_idx, X_tmp, mu
+            '''
+        return res_loss, min_idx, X_data, mu*dev+mean
         
-K = 3 # Define 3 clusters
+K = 5 # Define 3 clusters
 D = 2 #len(mean) # numbers of element per each dataset
 B = 10000
                 
 km = k_mean("data2D.npy")
 # Required argument: numbers of clusters, dimensions of points, numbers of points
-res_loss, min_idx, X_tmp, mu= km.cluster(K, D, B)
+res_loss, min_idx, X_data, mu= km.cluster(K, D, B)
 
-# Plot of the loss function
-fig1 = figure(1)
-plot(res_loss, 'b')
-show()
+plot.plot_loss(res_loss)
+plot.plot_cluster(min_idx, X_data, mu, K)
 
-
-print mu
-# Plot of clusters
-fig2 = figure(2)
-colors = ["r","b","g"]
-for i in range(3):
-    col = colors[i]
-    data = X_tmp[np.where(min_idx == i), :]
-    data = data[0, :]
-    scatter(data[:, 0], data[:, 1], c = col, alpha = 0.2)
-for i in range(3):
-    scatter(mu[i, 0], mu[i, 1], c = 'white', alpha = 1, marker = '+', s = 100)
-show()
