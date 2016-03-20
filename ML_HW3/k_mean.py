@@ -80,7 +80,7 @@ learning_rate =  0.01
 epsilon = 1e-5
 beta1 = 0.9
 beta2 = 0.99
-training_epochs = 100
+training_epochs = 10
 
 optimizer = tf.train.AdamOptimizer(learning_rate, beta1, beta2, epsilon)
 train_op = optimizer.minimize(loss)
@@ -92,4 +92,5 @@ sess.run(init)
 for epoch in range(training_epochs):
     loss_np, _ = sess.run([loss, train_op], feed_dict={X: X_tmp})
     print loss_np
+    print Y.eval()
 
