@@ -9,7 +9,8 @@ import numpy as np
 import tensorflow as tf
 import math as mt
 import Euclid_Distance as ed # import functions from local
-
+from matplotlib.pyplot import *
+import itertools
 '''
 Calculate the means of 10,000 datasets on both dimensions
 '''   
@@ -34,8 +35,15 @@ def cal_dev(x, mean):
     return dev
     
 # Read training data
-X_tmp= np.load('data2D.npy')
-
+X_data= np.load('data2D.npy')
+print X_data
+mean = X_data.mean()
+print mean
+dev = X_data.std()
+print dev
+X_tmp = (X_data - mean)/ dev
+print X_tmp
+# X_tmp = np.array([[1,2],[2,3],[3,4]])
 
 # calculate the means and deviations for later initilization
 '''
@@ -48,15 +56,12 @@ dev = cal_dev(X, mean)
 K = 3 # Define 3 clusters
 D = 2 #len(mean) # numbers of element per each dataset
 B = 10000
+
 '''
 Initialize the value of centers of 3 clusters 
 in 2 indep normal distribution
 '''
-'''
-Y = np.zeros(shape = [K, D])
-for i in range(D):
-    Y[0:K, i] = dev[i]*np.random.randn(K) + mean[i]
-'''
+
 X = tf.placeholder(tf.float32, [None, D], name='dataset')
 
 Y = tf.Variable(tf.random_normal(shape = (K,D), stddev = 1.0, dtype=tf.float32))
@@ -76,11 +81,11 @@ print loss.eval()
 '''
 
 # Set up the hyperparameters
-learning_rate =  0.01	
+learning_rate =  0.001	
 epsilon = 1e-5
 beta1 = 0.9
 beta2 = 0.99
-training_epochs = 10
+training_epochs = 1000
 
 optimizer = tf.train.AdamOptimizer(learning_rate, beta1, beta2, epsilon)
 train_op = optimizer.minimize(loss)
@@ -89,8 +94,32 @@ sess = tf.InteractiveSession()
 init = tf.initialize_all_variables()
 sess.run(init)
 
+res_loss = []
+min_idx = []
+record, loss_prv = 0, 0
 for epoch in range(training_epochs):
-    loss_np, _ = sess.run([loss, train_op], feed_dict={X: X_tmp})
-    print loss_np
-    print Y.eval()
+    loss_np, min_idx, _ = sess.run([loss, cluster, train_op], feed_dict={X: X_tmp})
+    if record == 20:
+    	break
+    elif loss_prv == loss_np:
+    	record += 1
+    else:
+    	loss_prv = loss_np
+    res_loss.append(loss_np)
+    if(epoch % 20 == 0):
+    	print loss_np
+    	print Y.eval()
 
+fig1 = figure(1)
+plot(res_loss, 'b')
+show()
+
+min_idx = np.array(min_idx)
+fig2 = figure(2)
+colors = itertools.cycle(["r","b","g"])
+for i in range(3):
+	myc = next(colors)
+	data = X_tmp[np.where(min_idx == i), :]
+	data = data[0, :]
+	scatter(data[:, 0], data[:, 1], c = myc, alpha = 0.2)
+show()

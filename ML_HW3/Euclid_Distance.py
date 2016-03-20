@@ -33,9 +33,12 @@ class Euclid_Distance:
         
 
     def cal_square(self, X, size_X, size_Y):
-        square = tf.matmul(X, X, False, True)
-        sqr_2_diag = tf.pack([square[i,i] for i in range(size_X)])
+        # square = tf.matmul(X, X, False, True)
+        # sqr_2_diag = tf.pack([square[i,i] for i in range(size_X)])
+        square = tf.square(X)
+        sqr_2_diag = tf.reduce_sum(square, 1)
         diagonal = tf.diag(sqr_2_diag)
+        diagonal = tf.reshape(diagonal, [size_X,size_X])
         ones = tf.ones(shape = [size_X, size_Y])
         result = tf.matmul(diagonal, ones, True)
         return result
@@ -48,10 +51,10 @@ class Euclid_Distance:
 
 X= np.array([[1,2], [2,3], [3,4]], dtype = np.float32)
 Y= np.array([[0,1], [1,2]], dtype = np.float32)
-'''
-with tf.Session():
-    ED = Euclid_Distance(X, Y, 2, 3)
-    print ED.cal_Euclid_dis().eval()
-'''
+
+# with tf.Session():
+#     ED = Euclid_Distance(X, Y, 2, 3)
+#     print ED.cal_Euclid_dis().eval()
+
 
 
