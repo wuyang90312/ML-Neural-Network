@@ -49,7 +49,7 @@ class k_mean:
         '''
 
         # Set up the hyperparameters
-        learning_rate =  0.01	
+        learning_rate =  0.001	
         epsilon = 1e-5
         beta1 = 0.9
         beta2 = 0.99
@@ -78,24 +78,28 @@ class k_mean:
             	print loss_np
             	print Y.eval()
 
-        fig1 = figure(1)
-        plot(res_loss, 'b')
-        show()
-
         min_idx = np.array(min_idx)
-        fig2 = figure(2)
-        colors = itertools.cycle(["r","b","g"])
-        for i in range(3):
-	        myc = next(colors)
-	        data = X_tmp[np.where(min_idx == i), :]
-	        data = data[0, :]
-	        scatter(data[:, 0], data[:, 1], c = myc, alpha = 0.2)
-        show()
+        return res_loss, min_idx, X_tmp
         
 K = 3 # Define 3 clusters
 D = 2 #len(mean) # numbers of element per each dataset
 B = 10000
                 
 km = k_mean("data2D.npy")
-km.cluster(K, D, B)
+# Required argument: numbers of clusters, dimensions of points, numbers of points
+res_loss, min_idx, X_tmp = km.cluster(K, D, B)
 
+# Plot of the loss function
+fig1 = figure(1)
+plot(res_loss, 'b')
+show()
+
+# Plot of clusters
+fig2 = figure(2)
+colors = itertools.cycle(["r","b","g"])
+for i in range(3):
+    myc = next(colors)
+    data = X_tmp[np.where(min_idx == i), :]
+    data = data[0, :]
+    scatter(data[:, 0], data[:, 1], c = myc, alpha = 0.2)
+show()
