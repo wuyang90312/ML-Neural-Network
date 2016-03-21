@@ -1,17 +1,11 @@
-'''
-Calculate the Squared Euclidean Distance b/t 
-pairs of points by the vectorized tensorflow,
-Without utilization of loop
-'''
-
-import numpy as np
 import tensorflow as tf
+import numpy as np
 
-
-class Euclid_Distance:
-    def __init__(self, X, Y, D):
+class Log_Probability:
+    def __init__(self, X, Y, sigma, D):
         self.X = X
         self.Y = Y
+        self.sigma = sigma
         self.D = D
         
     def cal_Euclid_dis(self):
@@ -41,13 +35,24 @@ class Euclid_Distance:
         #print result.eval()
         return result
 
-'''
-X= np.array([[1,2], [2,3], [3,4]], dtype = np.float32)
-Y= np.array([[0,1], [1,2]], dtype = np.float32)
+    def cal_Term1(self, sigma):
+    	return -tf.transpose(tf.log(tf.sqrt(2 * pi * tf.square(sigma))))
+
+    def cal_Term2(self, ed, sigma):
+    	return -0.5 * tf.div(ed, tf.transpose(tf.square(sigma)))
+
+    def cal_log_probability(self):
+    	ed = self.cal_Euclid_dis()
+    	log_prob = self.cal_Term1(sigma) + self.cal_Term2(ed, sigma)
+    	return log_prob
+
+
+# logN(x;mu, sig^2) = - log(square(sqrt(2*pi*sig^2))) - 1/2*sgi^2 * exp((x-mu)(x-mu).T)
+X = np.array([[1,2,3], [2,3,4], [3,4,5]], dtype = np.float32)
+Y = np.array([[0,1,3], [1,2,5]], dtype = np.float32)
+sigma = tf.constant([[1.5],[0.5]], dtype = tf.float32)	
+pi = np.pi
 
 with tf.Session():
-    ED = Euclid_Distance(X, Y, 2)
-    print ED.cal_Euclid_dis().eval()
-'''
-
-
+	LP = Log_Probability(X, Y, sigma, 3)
+	print LP.cal_log_probability().eval()
