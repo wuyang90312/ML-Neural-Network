@@ -23,6 +23,7 @@ def k_comparison(K):
     division = tf.unsorted_segment_sum(data, segment_ids, K, name=None)
     with tf.Session():
         print "K =",K,":",division.eval()/10000
+        plot.plot_cluster(segment_ids, X_tmp, mu, K)
     
     
 for i in range(1, 6):

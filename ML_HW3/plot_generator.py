@@ -8,6 +8,7 @@ def plot_loss(loss):
 
 def plot_cluster(min_idx, X_data, mu, K):
     fig = figure(2)
+    fig_name = repr(K) + '_cluster'
     colors = ["r","b","g","y","m"]
     for i in range(K):
         col = colors[i]
@@ -17,6 +18,8 @@ def plot_cluster(min_idx, X_data, mu, K):
         
     for i in range(K):
         scatter(mu[i, 0], mu[i, 1], c = 'white', alpha = 1, marker = '+', s = 100)
-    show()
+    savefig(fig_name)
+    close()
+    # show()
 
     

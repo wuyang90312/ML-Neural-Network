@@ -91,8 +91,8 @@ class k_mean:
             	print Y.eval()
             '''
         return res_loss, min_idx, X_data, mu, mu*dev+mean
-'''        
-K = 5 # Define 3 clusters
+'''     
+K = 3 # Define 3 clusters
 D = 2 #len(mean) # numbers of element per each dataset
 B = 10000
                 
