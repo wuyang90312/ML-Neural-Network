@@ -15,7 +15,7 @@ def k_comparison(K):
                     
     KM = km.k_mean("data2D.npy")
     # Required argument: numbers of clusters, dimensions of points, numbers of points
-    _, segment_ids, X_tmp, mu= KM.cluster(K, D, B)
+    _, segment_ids, X_tmp, mu_normal, mu= KM.cluster(K, D, B)
     
     
     data = tf.ones(shape = [B,])

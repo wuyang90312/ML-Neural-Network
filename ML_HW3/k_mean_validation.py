@@ -16,15 +16,13 @@ def k_mean_validation(K):
                     
     KM = km.k_mean("data2D.npy")
     # Required argument: numbers of clusters, dimensions of points, numbers of points
-    _, segment_ids, X_tmp, mu= KM.cluster(K, D, B)
+    _, segment_ids, X_tmp, mu_normal, mu= KM.cluster(K, D, B, 1.0/3.0)
     
-    
-    data = tf.ones(shape = [B,])
-    
-    division = tf.unsorted_segment_sum(data, segment_ids, K, name=None)
+    # Take the validation set as input to calculate the loss from cluster centers
+    loss,_ = KM.cal_loss(KM.validation.astype(np.float32), mu_normal, D)
     with tf.Session():
-        print division.eval()/10000
+        print "K =",K,":",loss.eval()
     
     
 for i in range(1, 6):
-    k_mean_validation
+    k_mean_validation(i)

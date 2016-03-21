@@ -22,7 +22,7 @@ def k_comparison(K):
     
     division = tf.unsorted_segment_sum(data, segment_ids, K, name=None)
     with tf.Session():
-        print "K=",K,":",division.eval()/10000
+        print "K =",K,":",division.eval()/10000
     
     
 for i in range(1, 6):

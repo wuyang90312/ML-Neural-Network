@@ -34,9 +34,9 @@ class k_mean:
         The rest will be used as a training set
         '''
         seperation = int((1-portion)*B)
-        validation = X_data[seperation:,:]
+        self.validation = X_data[seperation:,:]
         X_data = X_data[:seperation,:]
-        print portion,seperation, X_data.shape, validation.shape
+        # print portion,seperation, X_data.shape, validation.shape
         
         # Normailize the training data        
         mean = X_data.mean()
@@ -90,7 +90,7 @@ class k_mean:
             	print loss_np
             	print Y.eval()
             '''
-        return res_loss, min_idx, X_data, mu*dev+mean
+        return res_loss, min_idx, X_data, mu, mu*dev+mean
 '''        
 K = 5 # Define 3 clusters
 D = 2 #len(mean) # numbers of element per each dataset
@@ -98,7 +98,7 @@ B = 10000
                 
 km = k_mean("data2D.npy")
 # Required argument: numbers of clusters, dimensions of points, numbers of points
-res_loss, min_idx, X_data, mu= km.cluster(K, D, B, 1.0/3.0)
+res_loss, min_idx, X_data, mu_normal, mu= km.cluster(K, D, B, 1.0/3.0)
 
 plot.plot_loss(res_loss)
 plot.plot_cluster(min_idx, X_data, mu, K)
