@@ -16,12 +16,31 @@ class k_mean:
     def __init__(self, file_name):
         self.file_name = file_name
     
-    def cluster(self, K, D, B):  
+    def cal_loss(self, X, Y, D):
+        ED = ed.Euclid_Distance(X, Y, D)
+        dist = ED.cal_Euclid_dis()
+        cluster = tf.argmin(dist, 1)
+        correspond_cluster = tf.gather(Y,cluster)
+        offset = tf.sub(X, correspond_cluster)
+        loss = tf.reduce_sum(tf.square(offset))
+        
+        return loss, cluster
+    
+    def cluster(self, K, D, B, portion=0):  
         # Read training data
         X_data= np.load(self.file_name)
+        '''
+        Take a certain percentage of data as a validation set
+        The rest will be used as a training set
+        '''
+        seperation = int((1-portion)*B)
+        validation = X_data[seperation:,:]
+        X_data = X_data[:seperation,:]
+        # print portion,seperation, X_data.shape, validation.shape
+        
+        # Normailize the training data        
         mean = X_data.mean()
         dev = X_data.std()
-        # Normailize the training data
         X_tmp = (X_data - mean)/ dev 
 
         '''
@@ -33,14 +52,7 @@ class k_mean:
 
         Y = tf.Variable(tf.random_normal(shape = (K,D), stddev = 1.0, dtype=tf.float32))
 
-        #with sess.as_default():
-        #print Y.eval()
-        ED = ed.Euclid_Distance(X, Y, D)
-        dist = ED.cal_Euclid_dis()
-        cluster = tf.argmin(dist, 1)
-        correspond_cluster = tf.gather(Y,cluster)
-        offset = tf.sub(X, correspond_cluster)
-        loss = tf.reduce_mean(tf.square(offset))
+        loss, cluster = self.cal_loss( X, Y, D)
         '''
         print cluster.eval()
         print offset.eval()
@@ -79,15 +91,15 @@ class k_mean:
             	print Y.eval()
             '''
         return res_loss, min_idx, X_data, mu*dev+mean
-        
+'''        
 K = 5 # Define 3 clusters
 D = 2 #len(mean) # numbers of element per each dataset
 B = 10000
                 
 km = k_mean("data2D.npy")
 # Required argument: numbers of clusters, dimensions of points, numbers of points
-res_loss, min_idx, X_data, mu= km.cluster(K, D, B)
+res_loss, min_idx, X_data, mu= km.cluster(K, D, B, 1.0/3.0)
 
 plot.plot_loss(res_loss)
 plot.plot_cluster(min_idx, X_data, mu, K)
-
+'''
