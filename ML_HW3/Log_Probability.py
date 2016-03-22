@@ -24,7 +24,6 @@ class Log_Probability:
         |  D(xB, y1) D(xB, y2) ... D(xB, yK)   |
         '''
         
-
     def cal_square(self, X):
         square = tf.square(X)
         result = tf.matmul(square, tf.ones(shape=[self.D ,1]))
@@ -45,7 +44,13 @@ class Log_Probability:
     	ed = self.cal_Euclid_dis()
     	log_prob = self.cal_Term1(sigma) + self.cal_Term2(ed, sigma)
     	return log_prob
-
+        '''
+        The format of the return value(solution):
+        |  logN(x1;u1,sig1^2) logN(x1;u2,sig2^2) ... logN(x1;uK,sigK^2)   |
+        |  logN(x2;u1,sig1^2) logN(x2;u2,sig2^2) ... logN(x2;uK,sigK^2)   |
+        |         ...                ...         ...         ...          |   
+        |  logN(xB;u1,sig1^2) logN(xB;u2,sig2^2) ... logN(xB;uK,sig1K^2)  |
+        '''
 
 # logN(x;mu, sig^2) = - log(square(sqrt(2*pi*sig^2))) - 1/2*sgi^2 * exp((x-mu)(x-mu).T)
 X = np.array([[1,2,3], [2,3,4], [3,4,5]], dtype = np.float32)
