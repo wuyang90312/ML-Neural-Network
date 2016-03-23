@@ -50,4 +50,3 @@ with tf.Session():
     print ED.cal_Euclid_dis().eval()
 '''
 
-
