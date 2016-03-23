@@ -17,17 +17,10 @@ class Log_Posterior:
         
         Euclid_dist = x2 + tf.transpose(y2) - 2*xy
         return Euclid_dist
-        '''
-        The format of the return value(solution):
-        |  D(x1, y1) D(x1, y2) ... D(x1, yK)   |
-        |  D(x2, y1) D(x2, y2) ... D(x2, yK)   |
-        |  ...          ...    ...    ...      |   
-        |  D(xB, y1) D(xB, y2) ... D(xB, yK)   |
-        '''
         
     def cal_square(self, X):
         square = tf.square(X)
-        result = tf.matmul(square, tf.ones(shape=[self.D ,1]))
+        result = tf.matmul(square, tf.ones(shape=[self.D ,1], dtype=tf.float32))
         return result
 
     def cal_XY(self, X, Y):
@@ -39,7 +32,8 @@ class Log_Posterior:
 
     def cal_term2(self, sigma):
         ed = self.cal_Euclid_dis()
-        d = -0.5 * tf.div(ed, tf.square(sigma))
+        # d = -0.5 * tf.div(ed, tf.square(sigma))
+        d = tf.mul(-0.5, tf.div(ed, tf.square(sigma)))
         return d
 
     def cal_term3(self):
@@ -51,16 +45,25 @@ class Log_Posterior:
         res = self.cal_term1(self.pi_k, self.sigma) + self.cal_term2(self.sigma) - self.cal_term3()
         return res
 
+'''
 #test case
-X = tf.constant([[1,2], [2,3], [3,4]], dtype = tf.float32)
-Y = tf.constant([[0,1], [1,2]], dtype = tf.float32)
-sigma = tf.constant([[1.5, 0.5]], dtype = tf.float32)
-pi_k = tf.constant([[0.4, 0.6]], dtype = tf.float32)    
+# X = tf.constant([[1,2], [2,3],[3,4]], dtype = tf.float32)
+X_data = np.load('data2D.npy')
+X = tf.placeholder(tf.float32, [None, 2], name='dataset')
+Y = tf.constant([[0,1], [1,2], [2,3]], dtype = tf.float32)
+sigma = tf.constant([[0.3, 0.2, 0.5]], dtype = tf.float32)
+pi_k = tf.constant([[0.4, 0.3, 0.3]], dtype = tf.float32)    
 pi = np.pi
 
-with tf.Session():
-    LP = Log_Posterior(X, Y, sigma, pi_k, 2)
-    res = LP.cal_log_posterior()
-    print res.eval()
+LP = Log_Posterior(X, Y, sigma, pi_k, 2)
+result = LP.cal_log_posterior()
 
+sess = tf.Session()
+res = sess.run([result], feed_dict={X:X_data})
+print res
 
+# with tf.Session():
+#     LP = Log_Posterior(X,Y,sigma,pi_k,2)
+#     res = LP.cal_log_posterior()
+#     print res.eval()
+'''
