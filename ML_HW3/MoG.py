@@ -35,7 +35,7 @@ class MoG:
         ED = ed.Euclid_Distance(X, Y, D)
         dist = ED.cal_Euclid_dis()
         cost = reduce_logsumexp(tf.div(-dist, 2*exp_sigma) + log_pi - tf.log(tf.sqrt(2 * pi * exp_sigma)))
-        loss = -tf.reduce_mean(cost)
+        loss = -tf.reduce_sum(cost)
 
         learning_rate =  0.01
         epsilon = 1e-5
