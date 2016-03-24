@@ -25,11 +25,16 @@ class MoG:
         return loss
 
     def cluster(self, K, D, B, portion=0):
-        X_data = np.load('data2D.npy')  
+        X_data = np.load(self.file_name)  
 
+        # Normalize the training data
         seperation = int((1-portion)*B)
         self.validation = X_data[seperation:,:]
-        X_train = X_data[:seperation,:]      
+        self.train = X_data[:seperation,:]
+
+        # mean = X_train.mean()
+        # dev = X_train.std()
+        # X_train = (X_train - mean) / dev  
 
         # Initialize centoroid, pi_k and sigma
         X = tf.placeholder(tf.float32, [None, D], name='dataset')
@@ -42,7 +47,7 @@ class MoG:
 
         loss = self.cal_loss(X, Y, D, log_pi, exp_sigma)
 
-        learning_rate =  0.005
+        learning_rate =  0.01
         epsilon = 1e-5
         beta1 = 0.9
         beta2 = 0.99
@@ -58,9 +63,9 @@ class MoG:
         res_loss = []
         record, loss_prv = 0, 0
         for epoch in range(training_epochs):
-            _, loss_np, mu_final, pi_np, sigma_square, pi_log= sess.run([train_op, loss, Y, pi_k, exp_sigma, log_pi], feed_dict={X: X_train})
+            _, loss_np, mu_final, pi_np, sigma_square, pi_log= sess.run([train_op, loss, Y, pi_k, exp_sigma, log_pi], feed_dict={X: self.train})
             res_loss.append(loss_np)
-            if record == 200:
+            if record == 50:
                 break
             elif loss_prv == loss_np:
                 record += 1
@@ -71,14 +76,14 @@ class MoG:
                 print 'epoch', epoch
                 print 'loss', loss_np
             '''
-        '''
+        print 'K =', K
         print 'loss_training:', loss_np
         print 'centoroid:', mu_final        
         pi_np = tf.exp(pi_np) / tf.reduce_sum(tf.exp(pi_np))
         print 'pi_k:', pi_np.eval()
         print 'sigma_square:', sigma_square
-        '''
-        min_idx = self.cal_min_idx(X_train, mu_final, D).eval()
+        
+        min_idx = self.cal_min_idx(self.train, mu_final, D).eval()
 
         return res_loss, X_data, mu_final, min_idx, sigma_square, pi_log
 
@@ -89,7 +94,7 @@ D = 2
 
 mog = MoG("data2D.npy")
 res_loss, X_plot, mu_plot, min_idx, _, _ = mog.cluster(K, D, B)
-print X_plot.shape, min_idx.shape
+
 plot.plot_loss(res_loss)
 plot.plot_cluster(min_idx, X_plot, mu_plot, K)
 '''

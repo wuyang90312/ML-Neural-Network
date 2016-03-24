@@ -12,11 +12,27 @@ def MoG_validation(K):
 	loss_valid = MoG_valid.cal_loss(MoG_valid.validation.astype(np.float32), mu, D, log_pi, sigma_2)
 	min_idx = MoG_valid.cal_min_idx(X_data, mu, D)
 
+	min_idx_train = MoG_valid.cal_min_idx(MoG_valid.train.astype(np.float32), mu, D)
+	min_idx_validation = MoG_valid.cal_min_idx(MoG_valid.validation.astype(np.float32), mu, D)
+
+
 	data = tf.ones(shape = [B,])
 	division = tf.unsorted_segment_sum(data, min_idx, K, name=None)
+
+	data_train = tf.ones(shape = [int(B * 2/3),])
+	division_train = tf.unsorted_segment_sum(data_train, min_idx_train, K, name=None)
+
+	data_validation = tf.ones(shape = [int(10000 - B * 2/3),])
+	division_validation = tf.unsorted_segment_sum(data_validation, min_idx_validation, K, name=None)
 	with tf.Session():
-		print 'K =', K, ',loss_validation:', loss_valid.eval(), "Proportion:",division.eval()/10000
+		print 'loss_validation:', loss_valid.eval()
+		print 'Total Proportion:', division.eval()/10000
+		print 'Training Proportion:', division_train.eval()/(B * 2/3)
+		print 'validation Proportion', division_validation.eval()/(10000 - B * 2/3)
 		plot.plot_cluster(min_idx.eval(), X_data, mu, K)
+		plot.plot_train_cluster(min_idx_train.eval(), MoG_valid.train, mu, K)
+		plot.plot_validation_cluster(min_idx_validation.eval(), MoG_valid.validation, mu, K)
+
 
 B = 10000
 D = 2

@@ -22,4 +22,34 @@ def plot_cluster(min_idx, X_data, mu, K):
     close()
     # show()
 
-    
+def plot_train_cluster(min_idx, X_data, mu, K):
+    fig = figure(2)
+    fig_name = repr(K) + '_train_cluster'
+    colors = ["r","b","g","y","m"]
+    for i in range(K):
+        col = colors[i]
+        data = X_data[np.where(min_idx == i), :]
+        data = data[0, :]
+        scatter(data[:, 0], data[:, 1], c = col, alpha = 0.3)
+        
+    for i in range(K):
+        scatter(mu[i, 0], mu[i, 1], c = 'white', alpha = 1, marker = '+', s = 100)
+    savefig(fig_name)
+    close()
+    # show()
+
+def plot_validation_cluster(min_idx, X_data, mu, K):
+    fig = figure(2)
+    fig_name = repr(K) + '_validation_cluster'
+    colors = ["r","b","g","y","m"]
+    for i in range(K):
+        col = colors[i]
+        data = X_data[np.where(min_idx == i), :]
+        data = data[0, :]
+        scatter(data[:, 0], data[:, 1], c = col, alpha = 0.3)
+        
+    for i in range(K):
+        scatter(mu[i, 0], mu[i, 1], c = 'white', alpha = 1, marker = '+', s = 100)
+    savefig(fig_name)
+    close()
+    # show()
