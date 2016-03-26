@@ -15,15 +15,15 @@ def k_comparison(K):
                     
     KM = km.k_mean("data2D.npy")
     # Required argument: numbers of clusters, dimensions of points, numbers of points
-    _, segment_ids, X_tmp, mu_normal, mu= KM.cluster(K, D, B)
+    _, segment_ids, X_data, mu= KM.cluster(K, D, B)
     
     
     data = tf.ones(shape = [B,])
-    
     division = tf.unsorted_segment_sum(data, segment_ids, K, name=None)
+    
     with tf.Session():
         print "K =",K,":",division.eval()/10000
-        plot.plot_cluster(segment_ids, X_tmp, mu, K)
+        plot.plot_cluster(segment_ids, X_data, mu, K)
     
     
 for i in range(1, 6):

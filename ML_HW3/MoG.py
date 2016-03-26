@@ -1,20 +1,22 @@
 import numpy as np
 import tensorflow as tf
 import plot_generator as plot
-import Euclid_Distance as ed # import functions from local
+import Euclid_Distance as ed 
 from utils import *
+import Log_Posterior as LPosterior
 
 pi = np.pi
 class MoG:
     def __init__(self, file_name):
         self.file_name = file_name
 
-    def cal_min_idx(self, X, Y, D):
+    def cal_min_idx(self, X, Y, sigma, pi_k, D):
         X_input = tf.constant(X, dtype=tf.float32)
         Y_input = tf.constant(Y, dtype=tf.float32)
-        ED_min = ed.Euclid_Distance(X_input, Y_input, D)
-        ed_min = ED_min.cal_Euclid_dis()
-        min_idx = tf.argmin(ed_min, 1)
+        sigma_input = tf.constant(sigma, dtype=tf.float32)
+        LP = LPosterior.Log_Posterior(X_input, Y_input, sigma_input, pi_k, D)
+        post = LP.cal_log_posterior()        
+        min_idx = tf.argmax(post, 1)
         return min_idx
 
     def cal_loss(self, X, Y, D, log_pi, exp_sigma):
@@ -27,14 +29,9 @@ class MoG:
     def cluster(self, K, D, B, portion=0):
         X_data = np.load(self.file_name)  
 
-        # Normalize the training data
         seperation = int((1-portion)*B)
         self.validation = X_data[seperation:,:]
         self.train = X_data[:seperation,:]
-
-        # mean = X_train.mean()
-        # dev = X_train.std()
-        # X_train = (X_train - mean) / dev  
 
         # Initialize centoroid, pi_k and sigma
         X = tf.placeholder(tf.float32, [None, D], name='dataset')
@@ -51,7 +48,7 @@ class MoG:
         epsilon = 1e-5
         beta1 = 0.9
         beta2 = 0.99
-        training_epochs = 3000
+        training_epochs = 5000
 
         optimizer = tf.train.AdamOptimizer(learning_rate, beta1, beta2, epsilon)
         train_op = optimizer.minimize(loss)
@@ -63,29 +60,29 @@ class MoG:
         res_loss = []
         record, loss_prv = 0, 0
         for epoch in range(training_epochs):
-            _, loss_np, mu_final, pi_np, sigma_square, pi_log= sess.run([train_op, loss, Y, pi_k, exp_sigma, log_pi], feed_dict={X: self.train})
-            res_loss.append(loss_np)
-            if record == 50:
+            _, loss_train, mu_final, pi_final, sigma_square, pi_log = sess.run([train_op, loss, Y, pi_k, exp_sigma, log_pi], feed_dict={X: self.train})
+            res_loss.append(loss_train)
+            if record == 100:
                 break
-            elif loss_prv == loss_np:
+            elif loss_prv == loss_train:
                 record += 1
             else:
-                loss_prv = loss_np
-            '''
-            if(epoch % 100 == 0):
+                loss_prv = loss_train
+            
+            if(epoch % 200 == 0):
                 print 'epoch', epoch
-                print 'loss', loss_np
-            '''
+                print 'loss', loss_train
+            
         print 'K =', K
-        print 'loss_training:', loss_np
+        print 'loss_training:', loss_train
         print 'centoroid:', mu_final        
-        pi_np = tf.exp(pi_np) / tf.reduce_sum(tf.exp(pi_np))
+        pi_np = tf.exp(pi_final) / tf.reduce_sum(tf.exp(pi_final))
         print 'pi_k:', pi_np.eval()
         print 'sigma_square:', sigma_square
         
-        min_idx = self.cal_min_idx(self.train, mu_final, D).eval()
+        min_idx = self.cal_min_idx(self.train, mu_final, np.sqrt(sigma_square), pi_np, D).eval()
 
-        return res_loss, X_data, mu_final, min_idx, sigma_square, pi_log
+        return res_loss, X_data, mu_final, min_idx, sigma_square, pi_log, pi_np.eval()
 
 '''
 K = 3
@@ -93,7 +90,7 @@ B = 10000
 D = 2
 
 mog = MoG("data2D.npy")
-res_loss, X_plot, mu_plot, min_idx, _, _ = mog.cluster(K, D, B)
+res_loss, X_plot, mu_plot, min_idx, _, _, pi_1 = mog.cluster(K, D, B)
 
 plot.plot_loss(res_loss)
 plot.plot_cluster(min_idx, X_plot, mu_plot, K)

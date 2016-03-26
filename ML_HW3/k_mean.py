@@ -23,7 +23,6 @@ class k_mean:
         correspond_cluster = tf.gather(Y,cluster)
         offset = tf.sub(X, correspond_cluster)
         loss = tf.reduce_sum(tf.square(offset))
-        
         return loss, cluster
     
     def cluster(self, K, D, B, portion=0):  
@@ -35,32 +34,21 @@ class k_mean:
         '''
         seperation = int((1-portion)*B)
         self.validation = X_data[seperation:,:]
-        X_data = X_data[:seperation,:]
+        X_train = X_data[:seperation,:]
         # print portion,seperation, X_data.shape, validation.shape
         
-        # Normailize the training data        
-        mean = X_data.mean()
-        dev = X_data.std()
-        X_tmp = (X_data - mean)/ dev 
-
         '''
         Initialize the value of centers of 3 clusters 
         in 2 indep normal distribution
         '''
 
         X = tf.placeholder(tf.float32, [None, D], name='dataset')
-
-        Y = tf.Variable(tf.random_normal(shape = (K,D), stddev = 1.0, dtype=tf.float32))
+        Y = tf.Variable(tf.random_normal(shape = (K,D), dtype=tf.float32))
 
         loss, cluster = self.cal_loss( X, Y, D)
-        '''
-        print cluster.eval()
-        print offset.eval()
-        print loss.eval()
-        '''
 
         # Set up the hyperparameters
-        learning_rate =  0.001	
+        learning_rate =  0.001
         epsilon = 1e-5
         beta1 = 0.9
         beta2 = 0.99
@@ -77,8 +65,8 @@ class k_mean:
         min_idx = []
         record, loss_prv = 0, 0
         for epoch in range(training_epochs):
-            loss_np, min_idx, mu, _ = sess.run([loss, cluster, Y, train_op], feed_dict={X: X_tmp})
-            if record == 200:
+            loss_np, min_idx, mu, _ = sess.run([loss, cluster, Y, train_op], feed_dict={X: X_train})
+            if record == 100:
             	break
             elif loss_prv == loss_np:
             	record += 1
@@ -90,7 +78,7 @@ class k_mean:
             	print loss_np
             	print Y.eval()
             '''
-        return res_loss, min_idx, X_data, mu, mu*dev+mean
+        return res_loss, min_idx, X_data, mu
 '''     
 K = 3 # Define 3 clusters
 D = 2 #len(mean) # numbers of element per each dataset
@@ -98,7 +86,7 @@ B = 10000
                 
 km = k_mean("data2D.npy")
 # Required argument: numbers of clusters, dimensions of points, numbers of points
-res_loss, min_idx, X_data, mu_normal, mu= km.cluster(K, D, B, 1.0/3.0)
+res_loss, min_idx, X_data, mu= km.cluster(K, D, B, 1.0/3.0)
 
 plot.plot_loss(res_loss)
 plot.plot_cluster(min_idx, X_data, mu, K)

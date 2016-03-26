@@ -26,10 +26,10 @@ class Log_Probability:
         return result
 
     def cal_Term1(self, sigma):
-        return -tf.log(tf.sqrt(2 * pi * tf.square(sigma)))
+        return -0.5*tf.log(2 * pi * tf.square(sigma))
 
     def cal_Term2(self, ed, sigma):
-        return -0.5 * tf.div(ed, tf.square(sigma))
+        return tf.div(-ed, 2 * tf.square(sigma))
 
     def cal_log_probability(self):
     	ed = self.cal_Euclid_dis()
@@ -45,19 +45,21 @@ class Log_Probability:
 '''
 # test case
 # logN(x;mu, sig^2) = - log(square(sqrt(2*pi*sig^2))) - 1/2*sgi^2 * ((x-mu)(x-mu).T)
-# X = np.array([[1,2], [2,3], [3,4]], dtype = np.float32)
-X_data = np.load('data2D.npy')
-X = tf.placeholder(tf.float32, [None, 2], name='dataset')
+X = np.array([[1,2], [2,3], [3,4]], dtype = np.float32)
+# X_data = np.load('data2D.npy')
+# X = tf.placeholder(tf.float32, [None, 2], name='dataset')
 Y = np.array([[0,1], [1,2],[0,2]], dtype = np.float32)
 sigma = tf.constant([[0.4, 0.5, 0.3]], dtype = tf.float32)	
 pi = np.pi
 
 LP = Log_Probability(X, Y, sigma, 2)
 result = LP.cal_log_probability()
+with tf.Session():
+    print result.eval()
 
-sess = tf.Session()
-res = sess.run([result], feed_dict={X:X_data})
-print res
+# sess = tf.Session()
+# res = sess.run([result], feed_dict={X:X_data})
+# print res
 
 # with tf.Session():
 # 	LP = Log_Probability(X, Y, sigma, 2)

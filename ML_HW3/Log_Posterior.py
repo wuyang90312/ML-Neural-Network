@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from utils import *
-
+pi = np.pi
 class Log_Posterior:
     def __init__(self, X, Y, sigma, pi_k, D):
         self.X = X
@@ -53,7 +53,7 @@ X = tf.placeholder(tf.float32, [None, 2], name='dataset')
 Y = tf.constant([[0,1], [1,2], [2,3]], dtype = tf.float32)
 sigma = tf.constant([[0.3, 0.2, 0.5]], dtype = tf.float32)
 pi_k = tf.constant([[0.4, 0.3, 0.3]], dtype = tf.float32)    
-pi = np.pi
+
 
 LP = Log_Posterior(X, Y, sigma, pi_k, 2)
 result = LP.cal_log_posterior()
@@ -61,6 +61,7 @@ result = LP.cal_log_posterior()
 sess = tf.Session()
 res = sess.run([result], feed_dict={X:X_data})
 print res
+
 
 # with tf.Session():
 #     LP = Log_Posterior(X,Y,sigma,pi_k,2)
