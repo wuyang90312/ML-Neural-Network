@@ -4,6 +4,7 @@ import plot_generator as plot
 import Euclid_Distance as ed 
 from utils import *
 import Log_Posterior as LPosterior
+import Log_Probability as LProbability
 
 pi = np.pi
 class MoG:
@@ -15,8 +16,8 @@ class MoG:
         Y_input = tf.constant(Y, dtype=tf.float32)
         sigma_input = tf.constant(sigma, dtype=tf.float32)
         LP = LPosterior.Log_Posterior(X_input, Y_input, sigma_input, pi_k, D)
-        post = LP.cal_log_posterior()        
-        min_idx = tf.argmax(post, 1)
+        post = LP.cal_log_posterior() 
+        min_idx = tf.argmax(post, 1)   
         return min_idx
 
     def cal_loss(self, X, Y, D, log_pi, exp_sigma):
@@ -27,7 +28,7 @@ class MoG:
         return loss
 
     def cluster(self, K, D, B, portion=0):
-        X_data = np.load(self.file_name)  
+        X_data = np.load(self.file_name).astype(np.float32) 
 
         seperation = int((1-portion)*B)
         self.validation = X_data[seperation:,:]
@@ -48,7 +49,7 @@ class MoG:
         epsilon = 1e-5
         beta1 = 0.9
         beta2 = 0.99
-        training_epochs = 5000
+        training_epochs = 3000
 
         optimizer = tf.train.AdamOptimizer(learning_rate, beta1, beta2, epsilon)
         train_op = optimizer.minimize(loss)
@@ -60,7 +61,7 @@ class MoG:
         res_loss = []
         record, loss_prv = 0, 0
         for epoch in range(training_epochs):
-            _, loss_train, mu_final, pi_final, sigma_square, pi_log = sess.run([train_op, loss, Y, pi_k, exp_sigma, log_pi], feed_dict={X: self.train})
+            loss_train, _, mu_final, pi_final, sigma_square, pi_log = sess.run([loss, train_op, Y, pi_k, exp_sigma, log_pi], feed_dict={X: self.train})
             res_loss.append(loss_train)
             if record == 100:
                 break
@@ -68,11 +69,11 @@ class MoG:
                 record += 1
             else:
                 loss_prv = loss_train
-            
+            '''
             if(epoch % 200 == 0):
                 print 'epoch', epoch
                 print 'loss', loss_train
-            
+            '''
         print 'K =', K
         print 'loss_training:', loss_train
         print 'centoroid:', mu_final        
@@ -84,6 +85,7 @@ class MoG:
 
         return res_loss, X_data, mu_final, min_idx, sigma_square, pi_log, pi_np.eval()
 
+# When K = 3, compute the loss function for the whole data 
 '''
 K = 3
 B = 10000

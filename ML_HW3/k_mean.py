@@ -9,7 +9,6 @@ import numpy as np
 import tensorflow as tf
 import Euclid_Distance as ed # import functions from local
 import plot_generator as plot
-# from matplotlib.pyplot import *
  
 class k_mean:
 
@@ -52,7 +51,7 @@ class k_mean:
         epsilon = 1e-5
         beta1 = 0.9
         beta2 = 0.99
-        training_epochs = 3000
+        training_epochs = 5000
 
         optimizer = tf.train.AdamOptimizer(learning_rate, beta1, beta2, epsilon)
         train_op = optimizer.minimize(loss)

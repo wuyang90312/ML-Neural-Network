@@ -9,12 +9,10 @@ import k_mean as km
 import plot_generator as plot
 
 def k_comparison(K):
-    #K = 5 # Define 3 clusters
-    D = 2 #len(mean) # numbers of element per each dataset
+    D = 2
     B = 10000
                     
     KM = km.k_mean("data2D.npy")
-    # Required argument: numbers of clusters, dimensions of points, numbers of points
     _, segment_ids, X_data, mu= KM.cluster(K, D, B)
     
     

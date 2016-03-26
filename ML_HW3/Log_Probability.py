@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
+pi = np.pi
 class Log_Probability:
     def __init__(self, X, Y, sigma, D):
         self.X = X
@@ -24,17 +25,20 @@ class Log_Probability:
     def cal_XY(self, X, Y):
         result = tf.matmul(X,Y, False, True)
         return result
-
+    '''
+        logN(x;mu, sigma^2) = -0.5 * log(2*pi*sigma^2) - 1/(2*sigma^2) * ((x-mu)(x-mu).T)
+        Calculate the two terms separately to get the log probability.
+    '''
     def cal_Term1(self, sigma):
-        return -0.5*tf.log(2 * pi * tf.square(sigma))
+        return -0.5*tf.log(2 * pi * tf.square(self.sigma))
 
     def cal_Term2(self, ed, sigma):
-        return tf.div(-ed, 2 * tf.square(sigma))
+        return tf.div(-ed, 2 * tf.square(self.sigma))
 
     def cal_log_probability(self):
-    	ed = self.cal_Euclid_dis()
-    	log_prob = self.cal_Term1(sigma) + self.cal_Term2(ed, sigma)
-    	return log_prob
+        ed = self.cal_Euclid_dis()
+        log_prob = self.cal_Term1(self.sigma) + self.cal_Term2(ed, self.sigma)
+        return log_prob
         '''
         The format of the return value(solution):
         |  logN(x1;u1,sig1^2) logN(x1;u2,sig2^2) ... logN(x1;uK,sigK^2)   |
@@ -44,24 +48,11 @@ class Log_Probability:
         '''
 '''
 # test case
-# logN(x;mu, sig^2) = - log(square(sqrt(2*pi*sig^2))) - 1/2*sgi^2 * ((x-mu)(x-mu).T)
-X = np.array([[1,2], [2,3], [3,4]], dtype = np.float32)
-# X_data = np.load('data2D.npy')
-# X = tf.placeholder(tf.float32, [None, 2], name='dataset')
-Y = np.array([[0,1], [1,2],[0,2]], dtype = np.float32)
-sigma = tf.constant([[0.4, 0.5, 0.3]], dtype = tf.float32)	
-pi = np.pi
+X = np.load('data2D.npy').astype(np.float32)
+Y = np.array([[0,1], [1,2]], dtype = np.float32)
+sigma = tf.constant([[0.6, 0.4]], dtype = tf.float32)   
 
-LP = Log_Probability(X, Y, sigma, 2)
-result = LP.cal_log_probability()
 with tf.Session():
-    print result.eval()
-
-# sess = tf.Session()
-# res = sess.run([result], feed_dict={X:X_data})
-# print res
-
-# with tf.Session():
-# 	LP = Log_Probability(X, Y, sigma, 2)
-# 	print LP.cal_log_probability().eval()
+    LP = Log_Probability(X, Y, sigma, 2)
+    print LP.cal_log_probability().eval()
 '''
