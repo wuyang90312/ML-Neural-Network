@@ -4,6 +4,8 @@ from matplotlib.pyplot import *
 def plot_loss(loss):
     fig = figure(1)
     plot(loss, 'b')
+    xlabel('Number of updates')
+    ylabel('Loss')
     show()
 
 def plot_cluster(min_idx, X_data, mu, K):

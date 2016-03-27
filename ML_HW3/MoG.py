@@ -34,7 +34,7 @@ class MoG:
         self.validation = X_data[seperation:,:]
         self.train = X_data[:seperation,:]
 
-        # Initialize centoroid, pi_k and sigma
+        # Initialize centroid, pi_k and sigma
         X = tf.placeholder(tf.float32, [None, D], name='dataset')
         Y = tf.Variable(tf.random_normal(shape = (K,D), dtype=tf.float32))
         pi_k = tf.Variable(tf.random_normal(shape=(1,K), dtype=tf.float32))
@@ -76,7 +76,7 @@ class MoG:
             '''
         print 'K =', K
         print 'loss_training:', loss_train
-        print 'centoroid:', mu_final        
+        print 'centroid:', mu_final        
         pi_np = tf.exp(pi_final) / tf.reduce_sum(tf.exp(pi_final))
         print 'pi_k:', pi_np.eval()
         print 'sigma_square:', sigma_square

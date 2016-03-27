@@ -23,6 +23,5 @@ def k_comparison(K):
         print "K =",K,":",division.eval()/10000
         plot.plot_cluster(segment_ids, X_data, mu, K)
     
-    
 for i in range(1, 6):
     k_comparison(i)
