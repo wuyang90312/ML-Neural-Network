@@ -49,7 +49,7 @@ class MoG:
         epsilon = 1e-5
         beta1 = 0.9
         beta2 = 0.99
-        training_epochs = 2000
+        training_epochs = 3000
 
         optimizer = tf.train.AdamOptimizer(learning_rate, beta1, beta2, epsilon)
         train_op = optimizer.minimize(loss)
@@ -63,7 +63,7 @@ class MoG:
         for epoch in range(training_epochs):
             loss_train, _, mu_final, pi_final, sigma_square, pi_log = sess.run([loss, train_op, Y, pi_k, exp_sigma, log_pi], feed_dict={X: self.train})
             res_loss.append(loss_train)
-            if record == 100:
+            if record == 500:
                 break
             elif loss_prv == loss_train:
                 record += 1
@@ -83,7 +83,7 @@ class MoG:
         min_idx = self.cal_min_idx(self.train, mu_final, np.sqrt(sigma_square), tf.exp(pi_log), D).eval()
 
         return res_loss, X_data, mu_final, min_idx, sigma_square, pi_log, tf.exp(pi_log).eval()
-'''
+
 # When K = 3, compute the loss function for the whole data 
 K = 3
 B = 10000
@@ -94,4 +94,3 @@ res_loss, X_plot, mu_plot, min_idx, _, _, pi_1 = mog.cluster(K, D, B)
 
 plot.plot_loss(res_loss)
 plot.plot_cluster(min_idx, X_plot, mu_plot, K)
-'''
