@@ -69,11 +69,11 @@ class MoG:
                 record += 1
             else:
                 loss_prv = loss_train
-            '''
+            
             if(epoch % 100 == 0):
                 print 'epoch', epoch
                 print 'loss', loss_train
-            '''
+            
         print 'K =', K
         print 'loss_training:', loss_train
         print 'centroid:', mu_final        

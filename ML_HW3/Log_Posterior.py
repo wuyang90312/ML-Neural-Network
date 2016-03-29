@@ -38,7 +38,7 @@ class Log_Posterior:
         return result
 
     def cal_term1(self, pi_k, sigma):
-        return tf.log(tf.div(pi_k, tf.sqrt(tf.pow(2 * pi * tf.square(sigma), self.D))))
+        return tf.log(pi_k) -  self.D/2 * tf.log(2 * pi * tf.square(sigma))
 
     def cal_term2(self, sigma):
         ed = self.cal_Euclid_dis()
