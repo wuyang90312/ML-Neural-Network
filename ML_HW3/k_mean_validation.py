@@ -22,6 +22,5 @@ def k_mean_validation(K):
     with tf.Session():
         print "K =",K,":",loss.eval()
     
-    
 for i in range(1, 6):
     k_mean_validation(i)

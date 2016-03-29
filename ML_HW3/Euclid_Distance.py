@@ -7,7 +7,13 @@ Without utilization of loop
 import numpy as np
 import tensorflow as tf
 
-
+'''
+The format of the return value(solution):
+|  D(x1, y1) D(x1, y2) ... D(x1, yK)   |
+|  D(x2, y1) D(x2, y2) ... D(x2, yK)   |
+|  ...          ...    ...    ...      |   
+|  D(xB, y1) D(xB, y2) ... D(xB, yK)   |
+'''
 class Euclid_Distance:
     def __init__(self, X, Y, D):
         self.X = X
@@ -20,16 +26,7 @@ class Euclid_Distance:
         xy = self.cal_XY(self.X,self.Y)
         
         Euclid_dist = x2 + tf.transpose(y2) - 2*xy
-        #print Euclid_dist.eval()
         return Euclid_dist
-        '''
-        The format of the return value(solution):
-        |  D(x1, y1) D(x1, y2) ... D(x1, yK)   |
-        |  D(x2, y1) D(x2, y2) ... D(x2, yK)   |
-        |  ...          ...    ...    ...      |   
-        |  D(xB, y1) D(xB, y2) ... D(xB, yK)   |
-        '''
-        
 
     def cal_square(self, X):
         square = tf.square(X)
@@ -38,10 +35,10 @@ class Euclid_Distance:
 
     def cal_XY(self, X, Y):
         result = tf.matmul(X,Y, False, True)
-        #print result.eval()
         return result
 
 '''
+#test case
 X= np.array([[1,2], [2,3], [3,4]], dtype = np.float32)
 Y= np.array([[0,1], [1,2]], dtype = np.float32)
 
@@ -49,4 +46,3 @@ with tf.Session():
     ED = Euclid_Distance(X, Y, 2)
     print ED.cal_Euclid_dis().eval()
 '''
-

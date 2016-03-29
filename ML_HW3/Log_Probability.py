@@ -2,6 +2,12 @@ import tensorflow as tf
 import numpy as np
 
 pi = np.pi
+
+'''
+    logN(x;mu, sigma^2) = -0.5 * log(2*pi*sigma^2) - 1/(2*sigma^2) * ((x-mu)(x-mu).T)
+    Calculate the two terms separately to get the log probability.
+'''
+
 class Log_Probability:
     def __init__(self, X, Y, sigma, D):
         self.X = X
@@ -25,12 +31,9 @@ class Log_Probability:
     def cal_XY(self, X, Y):
         result = tf.matmul(X,Y, False, True)
         return result
-    '''
-        logN(x;mu, sigma^2) = -0.5 * log(2*pi*sigma^2) - 1/(2*sigma^2) * ((x-mu)(x-mu).T)
-        Calculate the two terms separately to get the log probability.
-    '''
+
     def cal_Term1(self, sigma):
-        return -0.5*tf.log(2 * pi * tf.square(self.sigma))
+        return -(self.D/2) * tf.log(2 * pi * tf.square(self.sigma))
 
     def cal_Term2(self, ed, sigma):
         return tf.div(-ed, 2 * tf.square(self.sigma))
@@ -39,6 +42,7 @@ class Log_Probability:
         ed = self.cal_Euclid_dis()
         log_prob = self.cal_Term1(self.sigma) + self.cal_Term2(ed, self.sigma)
         return log_prob
+        
         '''
         The format of the return value(solution):
         |  logN(x1;u1,sig1^2) logN(x1;u2,sig2^2) ... logN(x1;uK,sigK^2)   |
@@ -46,6 +50,7 @@ class Log_Probability:
         |         ...                ...         ...         ...          |   
         |  logN(xB;u1,sig1^2) logN(xB;u2,sig2^2) ... logN(xB;uK,sig1K^2)  |
         '''
+
 '''
 # test case
 X = np.load('data2D.npy').astype(np.float32)

@@ -23,7 +23,7 @@ class MoG:
     def cal_loss(self, X, Y, D, log_pi, exp_sigma):
         ED = ed.Euclid_Distance(X, Y, D)
         dist = ED.cal_Euclid_dis()
-        cost = reduce_logsumexp(tf.div(-dist, 2*exp_sigma) + log_pi - tf.log(tf.sqrt(2 * pi * exp_sigma)))
+        cost = reduce_logsumexp(tf.div(-dist, 2*exp_sigma) + log_pi - (D/2)* tf.log(2 * pi * exp_sigma))
         loss = -tf.reduce_sum(cost)
         return loss
 
@@ -42,14 +42,14 @@ class MoG:
 
         log_pi = logsoftmax(pi_k)
         exp_sigma = tf.exp(sigma)
-
         loss = self.cal_loss(X, Y, D, log_pi, exp_sigma)
 
+        # setting the hyperparameter for gradient descent
         learning_rate =  0.01
         epsilon = 1e-5
         beta1 = 0.9
         beta2 = 0.99
-        training_epochs = 3000
+        training_epochs = 2000
 
         optimizer = tf.train.AdamOptimizer(learning_rate, beta1, beta2, epsilon)
         train_op = optimizer.minimize(loss)
@@ -70,23 +70,21 @@ class MoG:
             else:
                 loss_prv = loss_train
             '''
-            if(epoch % 200 == 0):
+            if(epoch % 100 == 0):
                 print 'epoch', epoch
                 print 'loss', loss_train
             '''
         print 'K =', K
         print 'loss_training:', loss_train
         print 'centroid:', mu_final        
-        pi_np = tf.exp(pi_final) / tf.reduce_sum(tf.exp(pi_final))
-        print 'pi_k:', pi_np.eval()
+        print 'pi_k:', tf.exp(pi_log).eval()
         print 'sigma_square:', sigma_square
         
-        min_idx = self.cal_min_idx(self.train, mu_final, np.sqrt(sigma_square), pi_np, D).eval()
+        min_idx = self.cal_min_idx(self.train, mu_final, np.sqrt(sigma_square), tf.exp(pi_log), D).eval()
 
-        return res_loss, X_data, mu_final, min_idx, sigma_square, pi_log, pi_np.eval()
-
-# When K = 3, compute the loss function for the whole data 
+        return res_loss, X_data, mu_final, min_idx, sigma_square, pi_log, tf.exp(pi_log).eval()
 '''
+# When K = 3, compute the loss function for the whole data 
 K = 3
 B = 10000
 D = 2

@@ -15,7 +15,6 @@ def k_comparison(K):
     KM = km.k_mean("data2D.npy")
     _, segment_ids, X_data, mu= KM.cluster(K, D, B)
     
-    
     data = tf.ones(shape = [B,])
     division = tf.unsorted_segment_sum(data, segment_ids, K, name=None)
     

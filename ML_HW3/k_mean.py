@@ -51,7 +51,7 @@ class k_mean:
         epsilon = 1e-5
         beta1 = 0.9
         beta2 = 0.99
-        training_epochs = 5000
+        training_epochs = 3000
 
         optimizer = tf.train.AdamOptimizer(learning_rate, beta1, beta2, epsilon)
         train_op = optimizer.minimize(loss)
@@ -65,7 +65,7 @@ class k_mean:
         record, loss_prv = 0, 0
         for epoch in range(training_epochs):
             loss_np, min_idx, mu, _ = sess.run([loss, cluster, Y, train_op], feed_dict={X: X_train})
-            if record == 100:
+            if record == 200:
             	break
             elif loss_prv == loss_np:
             	record += 1
@@ -73,12 +73,13 @@ class k_mean:
             	loss_prv = loss_np
             res_loss.append(loss_np)
             '''
-            if(epoch % 20 == 0):
-            	print loss_np
-            	print Y.eval()
+            if(epoch % 200 == 0):
+            	print epoch, ':' ,loss_np
+            	# print Y.eval()
             '''
         return res_loss, min_idx, X_data, mu
-'''
+
+
 K = 3 # Define 3 clusters
 D = 2 #len(mean) # numbers of element per each dataset
 B = 10000
@@ -86,7 +87,7 @@ B = 10000
 km = k_mean("data2D.npy")
 # Required argument: numbers of clusters, dimensions of points, numbers of points
 res_loss, min_idx, X_data, mu= km.cluster(K, D, B, 1.0/3.0)
+print mu
 
 plot.plot_loss(res_loss)
 plot.plot_cluster(min_idx, X_data, mu, K)
-'''

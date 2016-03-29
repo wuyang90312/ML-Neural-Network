@@ -3,6 +3,15 @@ import numpy as np
 from utils import *
 
 pi = np.pi
+
+'''
+The log probability of posterior can be calculated by:
+logP(z|x) = log( (P(x|z)P(z))/ sum(P(x|z)P(z)))
+          = log(pi_k/sqrt(2*pi*sigma^2))     
+               - 1/(2*sigma^2) * ((x-mu)(x-mu).T) 
+               - log-sum-exp(log(pi_k/sqrt(2*pi*sigma^2)) - 1/(2*sigma^2) * ((x-mu)(x-mu).T)
+'''
+
 class Log_Posterior:
     def __init__(self, X, Y, sigma, pi_k, D):
         self.X = X
@@ -28,15 +37,8 @@ class Log_Posterior:
         result = tf.matmul(X,Y, False, True)
         return result
 
-    '''
-        The log probability of posterior can be calculated by:
-        logP(z|x) = log( (P(x|z)P(z))/ sum(P(x|z)P(z)))
-                  = log(pi_k/sqrt(2*pi*sigma^2))     
-                       - 1/(2*sigma^2) * ((x-mu)(x-mu).T) 
-                       - log-sum-exp(log(pi_k/sqrt(2*pi*sigma^2)) - 1/(2*sigma^2) * ((x-mu)(x-mu).T)
-    '''
     def cal_term1(self, pi_k, sigma):
-        return tf.log(tf.div(pi_k, tf.sqrt(2 * pi * tf.square(sigma))))
+        return tf.log(tf.div(pi_k, tf.sqrt(tf.pow(2 * pi * tf.square(sigma), self.D))))
 
     def cal_term2(self, sigma):
         ed = self.cal_Euclid_dis()
@@ -50,6 +52,7 @@ class Log_Posterior:
     def cal_log_posterior(self):
         res = self.cal_term1(self.pi_k, self.sigma) + self.cal_term2(self.sigma) - self.cal_term3()
         return res
+
 
 '''
 #test case

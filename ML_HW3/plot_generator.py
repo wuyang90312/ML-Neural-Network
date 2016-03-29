@@ -22,4 +22,3 @@ def plot_cluster(min_idx, X_data, mu, K):
         scatter(mu[i, 0], mu[i, 1], c = 'white', alpha = 1, marker = '+', s = 100)
     savefig(fig_name)
     close()
-    # show()
