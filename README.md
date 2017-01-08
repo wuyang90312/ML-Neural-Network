@@ -5,8 +5,10 @@
 
 ## Dependencies
 - Python2.7
-- Tensorflow: (Environment Setup)[https://www.tensorflow.org/get_started/os_setup]
+- Tensorflow ([Environment Setup][env_setup])
 - Numpy
 
 ## Compositions
 - ML_Basic cotains codes about the the basic algorithms and assigments from the ML course.
+
+[env_setup]: https://www.tensorflow.org/get_started/os_setup
