@@ -4,8 +4,8 @@
 - Post the related material and necessary borrowing code to help understand the concept of each project.
 
 ## Dependencies
+- [Tensorflow][env_setup]
 - Python2.7
-- Tensorflow ([Environment Setup][env_setup])
 - Numpy
 
 ## Compositions
